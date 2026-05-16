@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>TravelSOS</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+    rel="stylesheet" />
+  <link href="css/base.css" rel="stylesheet" />
+  <link href="css/home.css" rel="stylesheet" />
+  <link href="css/category.css" rel="stylesheet" />
+  <link href="css/components.css" rel="stylesheet" />
+  <style>
+    /* RTL support */
+    [dir="rtl"] .nav-links {
+      flex-direction: row-reverse;
+    }
+
+    [dir="rtl"] .auth-form {
+      text-align: right;
+    }
+
+    [lang="ar"] body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    [lang="zh-CN"] body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    [lang="th"] body {
+      font-size: 15px;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+</head>
+
+<body data-page="home">
+  <div class="overlay" id="auth-overlay">
+    <div class="auth-modal">
+      <div class="auth-modal-header">
+        <button class="auth-close" onclick="closeAuth()"><span class="material-symbols-rounded">close</span></button>
+        <h2 class="auth-title" style="display:flex;align-items:center;gap:10px"><img src="fox.png" style="width:32px;height:32px;border-radius:10px;object-fit:cover;" alt="" />TravelSOS</h2>
+        <p class="auth-sub" id="auth-sub-text">Sign in to your account</p>
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchAuthTab(this,'auth-login')">Sign in</button>
+          <button class="auth-tab" onclick="switchAuthTab(this,'auth-register')">Register</button>
+        </div>
+      </div>
+      <div class="auth-modal-scroll">
+      
+      <div id="auth-login">
+        <div class="auth-form">
+          <label>Email</label>
+          <input id="login-email" placeholder="you@email.com" type="email" />
+          <label>Password</label>
+          <input id="login-password" placeholder="••••••••" type="password" />
+          <div id="login-error"
+            style="font-size:12px;color:#D85A30;display:none;padding:6px 10px;background:#FAECE7;border-radius:7px">
+          </div>
+          <button class="btn btn-teal" onclick="doLogin()">Sign in</button>
+          <p class="auth-note">Don't have an account?
+            <span onclick="switchAuthTab(document.querySelectorAll('.auth-tab')[1],'auth-register')"
+              style="color:var(--teal);cursor:pointer">Register here</span>
+          </p>
+        </div>
+      </div>
+      
+      <div id="auth-register" style="display:none">
+        <div class="auth-form">
+          <div class="role-switch">
+            <p style="font-size:12px;color:var(--muted)">I am a…</p>
+            <button class="role-btn active" id="role-user" onclick="setRole('user')"><span class="material-symbols-rounded gf-icon">luggage</span> Traveller</button>
+            <button class="role-btn" id="role-vol" onclick="setRole('volunteer')"><span class="material-symbols-rounded gf-icon">volunteer_activism</span> Volunteer</button>
+          </div>
+          
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <label>First name</label>
+              <input id="reg-first" placeholder="Anna" type="text" />
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <label>Last name</label>
+              <input id="reg-last" placeholder="Müller" type="text" />
+            </div>
+          </div>
+          <label>Email</label>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <input id="reg-email" oninput="clearEmailStatus()" placeholder="you@email.com" style="flex:1;font-family:'Inter',sans-serif;font-size:14px;padding:9px 11px;
+                   border:1px solid var(--border);border-radius:8px;background:var(--bg);
+                   color:var(--text);outline:none" type="email" />
+            <button id="send-code-btn" onclick="sendEmailCode()" style="padding:9px 12px;background:var(--teal);color:#fff;border:none;
+                   border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;
+                   cursor:pointer;white-space:nowrap;flex-shrink:0">
+              Send code
+            </button>
+          </div>
+          <div id="email-status" style="display:none;font-size:12px;padding:6px 10px;border-radius:7px;margin-top:-4px">
+          </div>
+          
+          <div id="code-input-wrap" style="display:none;flex-direction:column;gap:6px">
+            <label>Enter 6-digit code from email</label>
+            <div style="display:flex;gap:8px">
+              <input id="reg-email-code" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')"
+                placeholder="123456" style="flex:1;font-family:'Inter',sans-serif;font-size:18px;letter-spacing:6px;
+                     text-align:center;padding:9px 11px;border:1px solid var(--border);
+                     border-radius:8px;background:var(--bg);color:var(--text);outline:none" type="text" />
+              <button id="check-code-btn" onclick="checkEmailCode()" style="padding:9px 12px;background:var(--teal);color:#fff;border:none;
+                     border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;
+                     cursor:pointer;white-space:nowrap;flex-shrink:0">
+                Confirm
+              </button>
+            </div>
+            <div id="resend-wrap" style="font-size:11px;color:var(--hint)">
+              Didn't receive it? Check spam or
+              <span onclick="sendEmailCode()" style="color:var(--teal);cursor:pointer">resend</span>
+            </div>
+          </div>
+          <label>Phone number <span style="color:var(--hint);font-weight:400">(for verification)</span></label>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <input id="reg-phone" oninput="clearPhoneStatus()" placeholder="+40712345678" style="flex:1;font-family:'Inter',sans-serif;font-size:14px;padding:9px 11px;
+                   border:1px solid var(--border);border-radius:8px;background:var(--bg);
+                   color:var(--text);outline:none" type="tel" />
+            <button id="verify-phone-btn" onclick="verifyPhone()" style="padding:9px 12px;background:var(--teal);color:#fff;border:none;
+                   border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;
+                   cursor:pointer;white-space:nowrap;flex-shrink:0">
+              Verify
+            </button>
+          </div>
+          <div id="phone-status" style="display:none;font-size:12px;padding:6px 10px;border-radius:7px;margin-top:-4px">
+          </div>
+          <label>Password <span style="color:var(--hint);font-weight:400">(min 6 chars)</span></label>
+          <input id="reg-password" placeholder="••••••••" type="password" />
+          <label>Confirm password</label>
+          <input id="reg-confirm" placeholder="••••••••" type="password" />
+          
+          <div id="vol-fields" style="display:none;flex-direction:column;gap:11px">
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <p style="font-size:12px;color:var(--muted);margin:0"><span class="material-symbols-rounded gf-icon">badge</span> Passport details <span
+                style="color:var(--hint)">(required for volunteer verification)</span></p>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label>Passport ID</label>
+              <input id="reg-passport-id" placeholder="AB1234567" type="text" />
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label>Nationality</label>
+              <input id="reg-nationality" placeholder="Romanian" type="text" />
+            </div>
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                <label>Date of birth</label>
+                <input id="reg-dob"
+                  style="font-family:'Inter',sans-serif;font-size:14px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);outline:none;width:100%;box-sizing:border-box"
+                  type="date" />
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                <label>Place of birth</label>
+                <input id="reg-pob" placeholder="Bucharest" type="text" />
+              </div>
+            </div>
+            <p class="auth-note" style="margin:0">Reviewed manually within 24h. Not shared with third parties.</p>
+          </div>
+          <div id="reg-error"
+            style="font-size:12px;color:#D85A30;display:none;padding:6px 10px;background:#FAECE7;border-radius:7px">
+          </div>
+          <button class="btn btn-teal" onclick="doRegister()">Create account</button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <nav>
+    <a class="nav-logo" href="#" onclick="goHome(); return false;"><img src="fox.png" class="nav-logo-fox" alt="Fox logo" /><span>Travel<span class="sos">SOS</span></span></a>
+    <div class="nav-links">
+      <button class="nav-link active" data-i18n="home" id="nav-home-btn" onclick="goHome()">Home</button>
+      <button class="nav-link" data-i18n="community" onclick="openForum()">Community</button>
+      <button class="nav-link" data-i18n="housing" onclick="openHousing()">Housing</button>
+    </div>
+    <select class="lang-select" id="lang-select" onchange="changeLanguage(this.value)">
+      <option value="uk">🇺🇦 UA</option>
+      <option value="tk">🇹🇲 TM</option>
+      <option value="tr">🇹🇷 TR</option>
+      <option value="th">🇹🇭 TH</option>
+      <option value="ro">🇷🇴 RO</option>
+      <option value="mk">🇲🇰 MK</option>
+      <option value="nl">🇳🇱 NL</option>
+      <option value="es">🇲🇽 MX</option>
+      <option value="ms">🇲🇾 MY</option>
+      <option value="kk">🇰🇿 KZ</option>
+      <option value="en">🇬🇧 GB</option>
+      <option value="ar">🇪🇬 EG</option>
+      <option value="zh-CN">🇨🇳 CN</option>
+      <option value="bg">🇧🇬 BG</option>
+      <option value="pt">🇧🇷 BR</option>
+      <option value="bs">🇧🇦 BA</option>
+      <option value="az">🇦🇿 AZ</option>
+      <option value="sq">🇦🇱 AL</option>
+    </select>
+    <button class="nav-auth" id="auth-btn" onclick="openAuth()"><span data-i18n="sign_in">Sign in</span></button>
+  </nav>
+  <div class="page active" id="page-home">
+    <main>
+      <div class="hero">
+        <p class="hero-eyebrow" data-i18n="eyebrow">Emergency travel help</p>
+        <h1 class="hero-title" data-i18n="hero_title">Something went wrong<br />abroad?</h1>
+        <p class="hero-sub" data-i18n="hero_sub">Pick your situation and get instant help. No login needed.</p>
+        <div class="country-bar">
+          <span id="hero-flag" style="display:none">🇺🇦</span>
+          <label data-i18n="showing_for">Showing info for</label>
+          <select id="hero-country" onchange="updateCountry(this.value)">
+            <option value="Ukraine">🇺🇦 Ukraine</option>
+            <option value="Turkmenistan">🇹🇲 Turkmenistan</option>
+            <option value="Turkey">🇹🇷 Turkey</option>
+            <option value="Thailand">🇹🇭 Thailand</option>
+            <option value="Romania">🇷🇴 Romania</option>
+            <option value="North Macedonia">🇲🇰 North Macedonia</option>
+            <option value="Netherlands">🇳🇱 Netherlands</option>
+            <option value="Moldova">🇲🇩 Moldova</option>
+            <option value="Mexico">🇲🇽 Mexico</option>
+            <option value="Malaysia">🇲🇾 Malaysia</option>
+            <option value="Kazakhstan">🇰🇿 Kazakhstan</option>
+            <option value="Great Britain" selected>🇬🇧 Great Britain</option>
+            <option value="Egypt">🇪🇬 Egypt</option>
+            <option value="Costa Rica">🇨🇷 Costa Rica</option>
+            <option value="China">🇨🇳 China</option>
+            <option value="Chile">🇨🇱 Chile</option>
+            <option value="Bulgaria">🇧🇬 Bulgaria</option>
+            <option value="Brazil">🇧🇷 Brazil</option>
+            <option value="Bosnia and Herzegovina">🇧🇦 Bosnia and Herzegovina</option>
+            <option value="Azerbaijan">🇦🇿 Azerbaijan</option>
+            <option value="Albania">🇦🇱 Albania</option>
+          </select>
+        </div>
+      </div>
+      <section class="emergency-stack" aria-label="Emergency services">
+        <a class="em-banner em-fire" id="em-fire-link" href="tel:999" aria-label="Call fire service">
+          <span class="em-service-icon"><span class="material-symbols-rounded">local_fire_department</span></span>
+          <div>
+            <div class="em-title">Fire service</div>
+            <div class="em-sub">Fire, smoke, rescue</div>
+          </div>
+          <div class="em-num" id="em-fire-num">999</div>
+        </a>
+        <a class="em-banner em-police" id="em-police-link" href="tel:999" aria-label="Call police">
+          <span class="em-service-icon"><span class="material-symbols-rounded">local_police</span></span>
+          <div>
+            <div class="em-title">Police</div>
+            <div class="em-sub">Threat, theft, danger</div>
+          </div>
+          <div class="em-num" id="em-police-num">999</div>
+        </a>
+        <a class="em-banner em-medical" id="em-ambulance-link" href="tel:999" aria-label="Call ambulance">
+          <span class="em-service-icon"><span class="material-symbols-rounded">medical_services</span></span>
+          <div>
+            <div class="em-title">Ambulance</div>
+            <div class="em-sub">Injury or urgent care</div>
+          </div>
+          <div class="em-num" id="em-ambulance-num">999</div>
+        </a>
+        <a class="em-banner em-utility" id="em-general-link" href="tel:112" aria-label="Call emergency">
+          <span class="em-service-icon"><span class="material-symbols-rounded">emergency_home</span></span>
+          <div>
+            <div class="em-title">Emergency</div>
+            <div class="em-sub">Gas, power, road hazard</div>
+          </div>
+          <div class="em-num" id="em-general-num">112</div>
+        </a>
+      </section>
+
+      <div class="country-info-panel" id="country-info-panel">
+        <div class="cip-header">
+          <span class="cip-flag" id="cip-flag">🇷🇴</span>
+          <span class="cip-title" id="cip-title">Romania</span>
+          <span class="cip-badge">Local info</span>
+        </div>
+        <div class="cip-grid" id="cip-grid">
+          <div class="cip-item">
+            <div class="cip-item-icon" style="background:#E1F5EE;color:#0F6E56"><span class="material-symbols-rounded">local_grocery_store</span></div>
+            <div class="cip-item-body"><div class="cip-item-label">Supermarkets & Malls</div><div class="cip-item-val" id="cip-supermarkets">IKEA, Auchan, Kaufland, Lidl, PENNY</div></div>
+          </div>
+          <div class="cip-item">
+            <div class="cip-item-icon" style="background:#E1F5EE;color:#0F6E56"><span class="material-symbols-rounded">medication</span></div>
+            <div class="cip-item-body"><div class="cip-item-label">Pharmacies</div><div class="cip-item-val" id="cip-pharmacies">Farmacia Dr. Max, Catena, Spring</div></div>
+          </div>
+          <div class="cip-item">
+            <div class="cip-item-icon" style="background:#FFEAEA;color:#D85A30"><span class="material-symbols-rounded">local_hospital</span></div>
+            <div class="cip-item-body"><div class="cip-item-label">Hospitals & Clinics</div><div class="cip-item-val" id="cip-hospitals">Synevo Dristor, MedLife, Medic Line</div></div>
+          </div>
+          <div class="cip-item">
+            <div class="cip-item-icon" style="background:#EEEDFE;color:#3C3489"><span class="material-symbols-rounded">volunteer_activism</span></div>
+            <div class="cip-item-body"><div class="cip-item-label">Volunteer orgs</div><div class="cip-item-val" id="cip-volunteers">Caritas, RMSA, Red Cross, UNHCR</div></div>
+          </div>
+          <div class="cip-item">
+            <div class="cip-item-icon" style="background:#FAEEDA;color:#854F0B"><span class="material-symbols-rounded">directions_bus</span></div>
+            <div class="cip-item-body"><div class="cip-item-label">Public transport</div><div class="cip-item-val" id="cip-transport">Uber, Bolt, FlixBus, BlaBlaCar, subway</div></div>
+          </div>
+          <div class="cip-item">
+            <div class="cip-item-icon" style="background:#E6F1FB;color:#185FA5"><span class="material-symbols-rounded">hotel</span></div>
+            <div class="cip-item-body"><div class="cip-item-label">Hostels & Hotels</div><div class="cip-item-val" id="cip-hostels">Sleep Inn Hostel, Nest Boutique, Villa Zorb</div></div>
+          </div>
+        </div>
+        <div class="cip-emergency" id="cip-emergency">
+          <a class="cip-em-btn cip-em-fire" id="cip-em-fire" href="tel:999">
+            <span class="material-symbols-rounded">local_fire_department</span>
+            <span class="cip-em-label">Fire</span>
+            <span class="cip-em-num" id="cip-num-fire">999</span>
+          </a>
+          <a class="cip-em-btn cip-em-police" id="cip-em-police" href="tel:999">
+            <span class="material-symbols-rounded">local_police</span>
+            <span class="cip-em-label">Police</span>
+            <span class="cip-em-num" id="cip-num-police">999</span>
+          </a>
+          <a class="cip-em-btn cip-em-ambulance" id="cip-em-ambulance" href="tel:999">
+            <span class="material-symbols-rounded">medical_services</span>
+            <span class="cip-em-label">Ambulance</span>
+            <span class="cip-em-num" id="cip-num-ambulance">999</span>
+          </a>
+          <a class="cip-em-btn cip-em-general" id="cip-em-general" href="tel:112">
+            <span class="material-symbols-rounded">emergency</span>
+            <span class="cip-em-label">General</span>
+            <span class="cip-em-num" id="cip-num-general">112</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="converter-box">
+        <div class="converter-label"><span class="material-symbols-rounded gf-icon">currency_exchange</span> Currency converter</div>
+        <div class="converter-grid">
+          <div>
+            <div class="converter-field-label">Amount</div>
+            <input class="converter-input" id="cc-amount" min="0" oninput="convertCurrency()" type="number"
+              value="100" />
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:2px">
+            <select class="converter-select" id="cc-from" onchange="convertCurrency()" style="width:auto">
+              <option value="UAH">🇺🇦 UAH ₴</option>
+              <option value="TMT">🇹🇲 TMT m</option>
+              <option value="TRY">🇹🇷 TRY ₺</option>
+              <option value="THB">🇹🇭 THB ฿</option>
+              <option selected="" value="RON">🇷🇴 RON L</option>
+              <option value="MKD">🇲🇰 MKD ден</option>
+              <option value="EUR">🇪🇺 EUR €</option>
+              <option value="MDL">🇲🇩 MDL L</option>
+              <option value="MXN">🇲🇽 MXN $</option>
+              <option value="MYR">🇲🇾 MYR RM</option>
+              <option value="KZT">🇰🇿 KZT ₸</option>
+              <option value="GBP">🇬🇧 GBP £</option>
+              <option value="EGP">🇪🇬 EGP £</option>
+              <option value="CRC">🇨🇷 CRC ₡</option>
+              <option value="CNY">🇨🇳 CNY ¥</option>
+              <option value="CLP">🇨🇱 CLP $</option>
+              <option value="BGN">🇧🇬 BGN лв</option>
+              <option value="BRL">🇧🇷 BRL R$</option>
+              <option value="BAM">🇧🇦 BAM KM</option>
+              <option value="AZN">🇦🇿 AZN ₼</option>
+              <option value="ALL">🇦🇱 ALL L</option>
+              <option value="USD">🇺🇸 USD $</option>
+            </select>
+            <button class="converter-swap" onclick="swapCurrency()" title="Swap">⇄</button>
+            <select class="converter-select" id="cc-to" onchange="convertCurrency()" style="width:auto">
+              <option value="UAH">🇺🇦 UAH ₴</option>
+              <option value="TMT">🇹🇲 TMT m</option>
+              <option value="TRY">🇹🇷 TRY ₺</option>
+              <option value="THB">🇹🇭 THB ฿</option>
+              <option value="RON">🇷🇴 RON L</option>
+              <option value="MKD">🇲🇰 MKD ден</option>
+              <option selected="" value="EUR">🇪🇺 EUR €</option>
+              <option value="MDL">🇲🇩 MDL L</option>
+              <option value="MXN">🇲🇽 MXN $</option>
+              <option value="MYR">🇲🇾 MYR RM</option>
+              <option value="KZT">🇰🇿 KZT ₸</option>
+              <option value="GBP">🇬🇧 GBP £</option>
+              <option value="EGP">🇪🇬 EGP £</option>
+              <option value="CRC">🇨🇷 CRC ₡</option>
+              <option value="CNY">🇨🇳 CNY ¥</option>
+              <option value="CLP">🇨🇱 CLP $</option>
+              <option value="BGN">🇧🇬 BGN лв</option>
+              <option value="BRL">🇧🇷 BRL R$</option>
+              <option value="BAM">🇧🇦 BAM KM</option>
+              <option value="AZN">🇦🇿 AZN ₼</option>
+              <option value="ALL">🇦🇱 ALL L</option>
+              <option value="USD">🇺🇸 USD $</option>
+            </select>
+          </div>
+          <div>
+            <div class="converter-field-label">Result</div>
+            <div class="converter-result" id="cc-result">—</div>
+          </div>
+        </div>
+        <div class="converter-rate" id="cc-rate">Loading rates…</div>
+      </div>
+      <p class="section-label">What do you need help with?</p>
+      <div class="cat-grid">
+        <div class="cat-card cat-teal" onclick="openCategory('carrental')">
+          <div class="cat-icon"><span class="material-symbols-rounded">key</span></div>
+          <div class="cat-name">Car rental</div>
+          <div class="cat-desc">Companies, conditions, age, deposit</div>
+        </div>
+        <div class="cat-card cat-amber" onclick="openCategory('border')">
+          <div class="cat-icon"><span class="material-symbols-rounded">flag</span></div>
+          <div class="cat-name">Border crossing</div>
+          <div class="cat-desc">Documents, queues, vignettes</div>
+        </div>
+        <div class="cat-card cat-purple" onclick="openCategory('documents')">
+          <div class="cat-icon"><span class="material-symbols-rounded">badge</span></div>
+          <div class="cat-name">Lost documents</div>
+          <div class="cat-desc">Embassy, temporary ID</div>
+        </div>
+        <div class="cat-card cat-coral" onclick="openCategory('medical')">
+          <div class="cat-icon"><span class="material-symbols-rounded">local_hospital</span></div>
+          <div class="cat-name">Medical help</div>
+          <div class="cat-desc">Clinics, EHIC, ambulance</div>
+        </div>
+        <div class="cat-card cat-blue" onclick="openCategory('scam')">
+          <div class="cat-icon"><span class="material-symbols-rounded">credit_card</span></div>
+          <div class="cat-name">Scam recovery</div>
+          <div class="cat-desc">Banks, police, hotline</div>
+        </div>
+        <div class="cat-card cat-pink" onclick="openCategory('car')">
+          <div class="cat-icon"><span class="material-symbols-rounded">directions_car</span></div>
+          <div class="cat-name">Car travel rules</div>
+          <div class="cat-desc">Limits, vignette, documents</div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <div style="max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px;text-align:left;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:14px">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--text);margin-bottom:6px">Travel<span style="color:var(--accent)">SOS</span></div>
+          <div style="font-size:12px;color:var(--hint);line-height:1.7">Emergency travel assistance platform.<br />Built at a hackathon.</div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Contacts</div>
+          <div style="font-size:12px;color:var(--hint);line-height:1.9">
+            <span class="material-symbols-rounded gf-icon">mail</span> <a href="mailto:foxhound6767@gmail.com" style="color:var(--hint)">foxhound6767@gmail.com</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Team</div>
+          <div style="font-size:12px;color:var(--hint);line-height:2.0">
+            <span style="display:flex;align-items:center;gap:6px"><span class="material-symbols-rounded gf-icon" style="font-size:13px">person</span>Vladyslava Polishchuk</span>
+            <span style="display:flex;align-items:center;gap:6px"><span class="material-symbols-rounded gf-icon" style="font-size:13px">person</span>Kamilzhan Sabirzhanov</span>
+            <span style="display:flex;align-items:center;gap:6px"><span class="material-symbols-rounded gf-icon" style="font-size:13px">person</span>Tymofii Tatarinov</span>
+            <span style="display:flex;align-items:center;gap:6px"><span class="material-symbols-rounded gf-icon" style="font-size:13px">person</span>Vladyslav Lyakhov</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Social</div>
+          <div style="font-size:12px;color:var(--hint);line-height:1.9">
+            <a href="#" style="color:var(--hint);display:flex;align-items:center;gap:5px"><span class="material-symbols-rounded gf-icon" style="font-size:14px">code</span>GitHub</a>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--hint);text-align:center;padding-bottom:4px">Developed by <span style="font-weight:600;color:var(--text);letter-spacing:.04em">FOXHOUND</span> &copy; 2026</div>
+    </footer>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/currency.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/timezone.js"></script>
+</body>
+
+</html>

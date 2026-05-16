@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>TravelSOS Admin</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/admin.css">
+
+</head>
+
+<body>
+
+<div class="login-wrap" id="login-screen">
+
+  <div class="login-box">
+
+    <div class="login-logo">
+
+      <div class="login-logo-icon">
+        <span class="material-symbols-rounded">shield_lock</span>
+      </div>
+
+      <div>
+        <div class="login-title">
+          TravelSOS
+        </div>
+
+        <div style="font-size:13px;color:var(--muted)">
+          Administrative access
+        </div>
+      </div>
+
+    </div>
+
+    <p class="login-sub">
+      Secure management dashboard for volunteers, support posts, and platform activity.
+    </p>
+
+    <div class="login-error" id="login-err">
+      Invalid login or password.
+    </div>
+
+    <div class="field">
+      <label>Username</label>
+
+      <input
+        id="adm-login"
+        placeholder="admin"
+        onkeydown="if(event.key==='Enter')doLogin()"
+      >
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+
+      <input
+        id="adm-pass"
+        type="password"
+        placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')doLogin()"
+      >
+    </div>
+
+    <button class="btn-login" onclick="doLogin()">
+      Sign In
+    </button>
+
+  </div>
+
+</div>
+
+<div class="admin-wrap" id="admin-panel">
+
+  <nav>
+
+    <div class="nav-left">
+
+      <div class="nav-icon" style="background:transparent;border:none;">
+        <img src="fox.png" alt="Fox logo" style="width:36px;height:36px;border-radius:11px;object-fit:cover;display:block;" />
+      </div>
+
+      <div class="nav-logo">
+        Travel<span class="sos">SOS</span>
+      </div>
+
+      <div class="nav-badge">
+        ADMIN
+      </div>
+
+    </div>
+
+    <div class="nav-right">
+
+      <a class="link" href="index.html">
+        Back to website
+      </a>
+
+      <button class="logout-btn" onclick="doLogout()">
+        Sign Out
+      </button>
+
+    </div>
+
+  </nav>
+
+  <div class="body">
+
+    <h1 class="page-title">
+      Dashboard
+    </h1>
+
+    <p class="page-sub">
+      Manage volunteers, user accounts, community posts and all TravelSOS platform operations from one secure place.
+    </p>
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <div class="stat-top">
+          <div class="stat-icon">
+            <span class="material-symbols-rounded">groups</span>
+          </div>
+        </div>
+
+        <div class="stat-n" id="s-users">—</div>
+
+        <div class="stat-l">
+          Registered users
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-top">
+          <div class="stat-icon">
+            <span class="material-symbols-rounded">pending_actions</span>
+          </div>
+        </div>
+
+        <div class="stat-n" id="s-pend">—</div>
+
+        <div class="stat-l">
+          Pending volunteers
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="tabs">
+
+      <button class="tab active" onclick="switchTab(this,'t-vol')">
+        <span class="material-symbols-rounded">groups</span>
+        Volunteers
+      </button>
+
+      <button class="tab" onclick="switchTab(this,'t-users')">
+        <span class="material-symbols-rounded">person</span>
+        Users
+      </button>
+
+      <button class="tab" onclick="switchTab(this,'t-posts')">
+        <span class="material-symbols-rounded">forum</span>
+        Posts
+      </button>
+
+      <button class="tab" onclick="switchTab(this,'t-settings')">
+        <span class="material-symbols-rounded">settings</span>
+        Settings
+      </button>
+
+    </div>
+
+    <div class="search-wrap">
+
+      <span class="material-symbols-rounded">search</span>
+
+      <input
+        type="text"
+        placeholder="Search users, volunteers or posts..."
+      >
+
+    </div>
+
+    <div class="section active" id="t-vol"></div>
+    <div class="section" id="t-users"></div>
+    <div class="section" id="t-posts"></div>
+
+    <div class="section" id="t-settings">
+
+      <div class="scard">
+
+        <div class="stitle">
+          Database Management
+        </div>
+
+        <div class="ssub">
+          Export platform data or remove all support posts and queue reports from Firebase Firestore.
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+
+          <button class="sbtn" onclick="exportData()">
+            Export JSON
+          </button>
+
+          <button class="sbtn red" onclick="resetData()">
+            Reset Posts
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="logout-modal" style="display:none;" onclick="handleOverlayClick(event)">
+
+  <div class="modal-box">
+
+    <div class="modal-icon">
+      <span class="material-symbols-rounded">logout</span>
+    </div>
+
+    <div class="modal-title">
+      Sign out of admin panel?
+    </div>
+
+    <div class="modal-sub">
+      You will be redirected to the login page.
+      All saved changes will remain secure.
+    </div>
+
+    <div class="modal-btns">
+
+      <button class="modal-cancel" onclick="closeLogoutModal()">
+        Cancel
+      </button>
+
+      <button class="modal-confirm" onclick="confirmLogout()">
+        Sign Out
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="js/admin.js"></script>
+
+</body>
+</html>

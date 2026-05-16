@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>TravelSOS — Post</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+    rel="stylesheet" />
+  <link href="css/base.css" rel="stylesheet" />
+  <link href="css/home.css" rel="stylesheet" />
+  <link href="css/category.css" rel="stylesheet" />
+  <link href="css/components.css" rel="stylesheet" />
+  <style>
+    /* RTL support */
+    [dir="rtl"] .nav-links {
+      flex-direction: row-reverse;
+    }
+
+    [dir="rtl"] .auth-form {
+      text-align: right;
+    }
+
+    [lang="ar"] body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    [lang="zh-CN"] body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    [lang="th"] body {
+      font-size: 15px;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+</head>
+
+<body data-page="post">
+  <div class="overlay" id="auth-overlay">
+    <div class="auth-modal">
+      <button class="auth-close" onclick="closeAuth()"><span class="material-symbols-rounded">close</span></button>
+      <h2 class="auth-title">TravelSOS</h2>
+      <p class="auth-sub" id="auth-sub-text">Sign in to your account</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab(this,'auth-login')">Sign in</button>
+        <button class="auth-tab" onclick="switchAuthTab(this,'auth-register')">Register</button>
+      </div>
+      
+      <div id="auth-login">
+        <div class="auth-form">
+          <label>Email</label>
+          <input id="login-email" placeholder="you@email.com" type="email" />
+          <label>Password</label>
+          <input id="login-password" placeholder="••••••••" type="password" />
+          <div id="login-error"
+            style="font-size:12px;color:#D85A30;display:none;padding:6px 10px;background:#FAECE7;border-radius:7px">
+          </div>
+          <button class="btn btn-teal" onclick="doLogin()">Sign in</button>
+          <p class="auth-note">Don't have an account?
+            <span onclick="switchAuthTab(document.querySelectorAll('.auth-tab')[1],'auth-register')"
+              style="color:var(--teal);cursor:pointer">Register here</span>
+          </p>
+        </div>
+      </div>
+      
+      <div id="auth-register" style="display:none">
+        <div class="auth-form">
+          <div class="role-switch">
+            <p style="font-size:12px;color:var(--muted)">I am a…</p>
+            <button class="role-btn active" id="role-user" onclick="setRole('user')"><span class="material-symbols-rounded gf-icon">luggage</span> Traveller</button>
+            <button class="role-btn" id="role-vol" onclick="setRole('volunteer')"><span class="material-symbols-rounded gf-icon">volunteer_activism</span> Volunteer</button>
+          </div>
+          
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <label>First name</label>
+              <input id="reg-first" placeholder="Anna" type="text" />
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <label>Last name</label>
+              <input id="reg-last" placeholder="Müller" type="text" />
+            </div>
+          </div>
+          <label>Email</label>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <input id="reg-email" oninput="clearEmailStatus()" placeholder="you@email.com" style="flex:1;font-family:'Inter',sans-serif;font-size:14px;padding:9px 11px;
+                   border:1px solid var(--border);border-radius:8px;background:var(--bg);
+                   color:var(--text);outline:none" type="email" />
+            <button id="send-code-btn" onclick="sendEmailCode()" style="padding:9px 12px;background:var(--teal);color:#fff;border:none;
+                   border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;
+                   cursor:pointer;white-space:nowrap;flex-shrink:0">
+              Send code
+            </button>
+          </div>
+          <div id="email-status" style="display:none;font-size:12px;padding:6px 10px;border-radius:7px;margin-top:-4px">
+          </div>
+          
+          <div id="code-input-wrap" style="display:none;flex-direction:column;gap:6px">
+            <label>Enter 6-digit code from email</label>
+            <div style="display:flex;gap:8px">
+              <input id="reg-email-code" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')"
+                placeholder="123456" style="flex:1;font-family:'Inter',sans-serif;font-size:18px;letter-spacing:6px;
+                     text-align:center;padding:9px 11px;border:1px solid var(--border);
+                     border-radius:8px;background:var(--bg);color:var(--text);outline:none" type="text" />
+              <button id="check-code-btn" onclick="checkEmailCode()" style="padding:9px 12px;background:var(--teal);color:#fff;border:none;
+                     border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;
+                     cursor:pointer;white-space:nowrap;flex-shrink:0">
+                Confirm
+              </button>
+            </div>
+            <div id="resend-wrap" style="font-size:11px;color:var(--hint)">
+              Didn't receive it? Check spam or
+              <span onclick="sendEmailCode()" style="color:var(--teal);cursor:pointer">resend</span>
+            </div>
+          </div>
+          <label>Phone number <span style="color:var(--hint);font-weight:400">(for verification)</span></label>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <input id="reg-phone" oninput="clearPhoneStatus()" placeholder="+40712345678" style="flex:1;font-family:'Inter',sans-serif;font-size:14px;padding:9px 11px;
+                   border:1px solid var(--border);border-radius:8px;background:var(--bg);
+                   color:var(--text);outline:none" type="tel" />
+            <button id="verify-phone-btn" onclick="verifyPhone()" style="padding:9px 12px;background:var(--teal);color:#fff;border:none;
+                   border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;
+                   cursor:pointer;white-space:nowrap;flex-shrink:0">
+              Verify
+            </button>
+          </div>
+          <div id="phone-status" style="display:none;font-size:12px;padding:6px 10px;border-radius:7px;margin-top:-4px">
+          </div>
+          <label>Password <span style="color:var(--hint);font-weight:400">(min 6 chars)</span></label>
+          <input id="reg-password" placeholder="••••••••" type="password" />
+          <label>Confirm password</label>
+          <input id="reg-confirm" placeholder="••••••••" type="password" />
+          
+          <div id="vol-fields" style="display:none;flex-direction:column;gap:11px">
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <p style="font-size:12px;color:var(--muted);margin:0"><span class="material-symbols-rounded gf-icon">badge</span> Passport details <span
+                style="color:var(--hint)">(required for volunteer verification)</span></p>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label>Passport ID</label>
+              <input id="reg-passport-id" placeholder="AB1234567" type="text" />
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label>Nationality</label>
+              <input id="reg-nationality" placeholder="Romanian" type="text" />
+            </div>
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                <label>Date of birth</label>
+                <input id="reg-dob"
+                  style="font-family:'Inter',sans-serif;font-size:14px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);outline:none;width:100%;box-sizing:border-box"
+                  type="date" />
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                <label>Place of birth</label>
+                <input id="reg-pob" placeholder="Bucharest" type="text" />
+              </div>
+            </div>
+            <p class="auth-note" style="margin:0">Reviewed manually within 24h. Not shared with third parties.</p>
+          </div>
+          <div id="reg-error"
+            style="font-size:12px;color:#D85A30;display:none;padding:6px 10px;background:#FAECE7;border-radius:7px">
+          </div>
+          <button class="btn btn-teal" onclick="doRegister()">Create account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav>
+    <a class="nav-logo" href="#" onclick="goHome(); return false;"><img src="fox.png" class="nav-logo-fox" alt="Fox logo" /><span>Travel<span class="sos">SOS</span></span></a>
+    <div class="nav-links">
+      <button class="nav-link active" data-i18n="home" id="nav-home-btn" onclick="goHome()">Home</button>
+      <button class="nav-link" data-i18n="community" onclick="openForum()">Community</button>
+      <button class="nav-link" data-i18n="housing" onclick="openHousing()">Housing</button>
+    </div>
+    <select class="lang-select" id="lang-select" onchange="changeLanguage(this.value)">
+      <option value="uk">🇺🇦 UA</option>
+      <option value="tk">🇹🇲 TM</option>
+      <option value="tr">🇹🇷 TR</option>
+      <option value="th">🇹🇭 TH</option>
+      <option value="ro">🇷🇴 RO</option>
+      <option value="mk">🇲🇰 MK</option>
+      <option value="nl">🇳🇱 NL</option>
+      <option value="es">🇲🇽 MX</option>
+      <option value="ms">🇲🇾 MY</option>
+      <option value="kk">🇰🇿 KZ</option>
+      <option value="en">🇬🇧 GB</option>
+      <option value="ar">🇪🇬 EG</option>
+      <option value="zh-CN">🇨🇳 CN</option>
+      <option value="bg">🇧🇬 BG</option>
+      <option value="pt">🇧🇷 BR</option>
+      <option value="bs">🇧🇦 BA</option>
+      <option value="az">🇦🇿 AZ</option>
+      <option value="sq">🇦🇱 AL</option>
+    </select>
+    <button class="nav-auth" id="auth-btn" onclick="openAuth()"><span data-i18n="sign_in">Sign in</span></button>
+  </nav>
+  <div class="page active" id="page-post">
+    <main>
+      <div class="post-detail-hdr">
+        <div class="breadcrumb"><span onclick="openForum()">Community</span><span>›</span><span id="pd-cat"></span>
+        </div>
+        <h2 class="post-detail-title" id="pd-title"></h2>
+        <div class="post-detail-meta">
+          <span id="pd-author"></span><span>·</span><span id="pd-time"></span><span>·</span><span
+            id="pd-country"></span>
+        </div>
+      </div>
+      <div
+        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;margin-bottom:20px">
+        <p id="pd-body" style="font-size:15px;line-height:1.65"></p>
+      </div>
+      <p class="replies-label" id="replies-lbl">0 replies</p>
+      <div id="post-replies"></div>
+      <div class="reply-form">
+        <textarea id="reply-input" placeholder="Write a reply… (sign in to post)" rows="3"></textarea>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-teal" onclick="submitReply()" data-i18n="post_reply">Post reply</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/currency.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/timezone.js"></script>
+</body>
+
+</html>
